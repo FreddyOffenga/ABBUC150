@@ -1,66 +1,116 @@
+/*
+** COMPILE:
+** # Windows
+** "c:\Program Files (x86)\MADS\mads.exe" -i:inc\ -o:xex\filename.xex filename.asm
+**
+** # Linux / OSX
+** mads -i:inc/ -o:xex/filename.xex filename.asm
+*/
+
+        icl "systemequates.20070530_bkw.inc"            ; Don't forget the specify -i:<path to file> at compile time
+
 ; ABBUC 150
 
         org $3010
 
-screen        
+lABBUC
         ins 'abbuc.raw'
         
         .align $1010
-;screen
+
+        org $4010
+lSAG
         ins 'sag.raw'
 
         org $2000
         
 main
-        lda #<dlist
-        sta $230
-        lda #>dlist
-        sta $231
-        
-        lda #0
-        sta 712
-        sta 710
-        
-        lda #04
-        sta 709
-        lda #$26
-        sta 708
-        
-        lda #<dli0
-        sta $200
-        lda #>dli0
-        sta $201
-        
-        lda #$c0
-        sta $d40e
 
-loop
-        jmp loop
-        
+        lda #0
+        sta COLBK
+        sta COLOR1
+        sta COLOR2
+        sta COLOR3
+        sta COLOR4
+
+        mwa #dli0 VDSLST
+        mwa #dlist SDLSTL
+                        
+        lda #$c0        ; Enable DLI
+        sta NMIEN
+
+/*
+        jmp *           ; Endless loop
+*/
+wait
+        lda CONSOL
+        cmp #6                  ; Wait for START
+        bne wait
+
+
+; Next part
+        mwa #lSAG logo
+        mwa #tSAG title
+        jmp wait
+
+        lda #$40
+        sta NMIEN
+
+        lda #6                  ; Restore Immediate VBlank 
+        ldx #$e4
+        ldy #$5f
+        jsr SETVBV
+
+        lda #0
+        sta COLOR0
+        sta COLOR1
+        sta COLOR2
+        sta COLBK
+        sta AUDC1
+        sta AUDC2
+        sta AUDC3
+        sta AUDC4
+        sta IRQST
+        sta DMACTL
+        sta NMIEN
+        lda #$ff
+        sta PORTB
+
+        jmp *
+
+        rts
+// END: main
+
+
 dlist
-        dta $70,$70,$70
-       
-        dta $4e
-        dta a(screen)
+:3      dta DL_BLANK1                   ; 70
+        dta DL_GR15 | DL_LMS            ; 4e
+
+logo
+        dta a(lABBUC)
+
+:101    dta DL_GR15
+        dta DL_BLANK7 | DL_DLI
+        dta DL_GR0 | DL_LMS
+
+title
+        dta a(tABBUC)
                 
-:101    dta $0e       
-        
-        dta $70+128
-        
-        dta $42
-        dta a(text)
-                
-        dta $41
+        dta DL_JVB
+
         dta a(dlist)
 
-text
+tABBUC
+        dta d'       Atari Bit Byters User Club       '
+tSAG
         dta d'       Stichting Atari Gebruikers       '
+
         run main
         
 dli0    pha
         lda #0
-        sta $d018
+        sta COLPF2
         lda #10
-        sta $d017
+        sta COLPF1
         pla
         rti
