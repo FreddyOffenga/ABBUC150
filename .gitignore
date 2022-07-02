@@ -1,0 +1,6 @@
+# No executables
+*.xex
+*.exe
+
+# No compile results
+*.obx
