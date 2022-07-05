@@ -7,7 +7,7 @@
 ** mads -i:inc/ -o:xex/filename.xex filename.asm
 */
 
-        icl "systemequates.20070530_bkw.inc"            ; Don't forget the specify -i:<path to file> at compile time
+        icl "inc/systemequates.20070530_bkw.inc"            ; Don't forget the specify -i:<path to file> at compile time
 
 ; ABBUC 150
 
