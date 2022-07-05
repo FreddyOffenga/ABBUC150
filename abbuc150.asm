@@ -22,6 +22,10 @@ lABBUC
 lSAG
         ins 'sag.raw'
 
+        org $5010
+lPOKEY
+        ins 'pokey.raw'
+
         org $2000
         
 main
@@ -81,13 +85,20 @@ wait
         rts
 // END: main
 
+dli0    pha
+        lda #0
+        sta COLPF2
+        lda #10
+        sta COLPF1
+        pla
+        rti
 
 dlist
 :3      dta DL_BLANK1                   ; 70
         dta DL_GR15 | DL_LMS            ; 4e
 
 logo
-        dta a(lABBUC)
+        dta a(lPOKEY)
 
 :101    dta DL_GR15
         dta DL_BLANK7 | DL_DLI
@@ -104,13 +115,7 @@ tABBUC
         dta d'       Atari Bit Byters User Club       '
 tSAG
         dta d'       Stichting Atari Gebruikers       '
+tPOKEY
+        dta d'            Stichting Pokey             '
 
         run main
-        
-dli0    pha
-        lda #0
-        sta COLPF2
-        lda #10
-        sta COLPF1
-        pla
-        rti
