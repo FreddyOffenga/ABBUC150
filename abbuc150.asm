@@ -14,39 +14,13 @@ target          = $f2
 line_count      = $f4
 image_number    = $f5
 current_dl_ptr  = $f6
-
-scanline_tab    = $8000
+last_dl_ptr     = $f8
 
 ; ABBUC 150
 
-        org $3010
-
-lABBUC
-        ins 'abbuc.raw'
-
-        .align $1010
-
-        org $4010
-lSAG
-        ins 'sag.raw'
-
-        org $5010
-lPOKEY
-        ins 'pokey.raw'
-
         org $2000
 
-image_tab_lo
-        dta <lABBUC
-        dta <lSAG
-        dta <lPOKEY
-
-image_tab_hi
-        dta >lABBUC
-        dta >lSAG
-        dta >lPOKEY
-
-IMAGE_COUNT = 2         ; image tab size
+IMAGE_COUNT = 4
 IMAGE_WIDTH = 40        ; bytes
 IMAGE_HEIGHT = 102      ; scanlines
 
@@ -70,6 +44,13 @@ add_source
         sta source+1
         rts
 
+reset_current_dl_ptr
+        lda #<scanline_tab
+        sta current_dl_ptr
+        lda #>scanline_tab
+        sta current_dl_ptr+1
+        rts
+        
 make_scanline_ptrs
         lda #<scanline_tab
         sta target
@@ -86,6 +67,12 @@ next_image
         lda image_tab_hi,x
         sta source+1
 
+; store last_dl_ptr, points to first scanline of last processed image
+        lda target
+        sta last_dl_ptr
+        lda target+1
+        sta last_dl_ptr+1
+    
         lda #IMAGE_HEIGHT
         sta line_count
 
@@ -115,50 +102,63 @@ copy_line_ptrs
         rts
 
 insert_image_dl
-        lda #<scanline_tab
-        sta current_dl_ptr
-        lda #>scanline_tab
-        sta current_dl_ptr+1
-        
         lda current_dl_ptr
         sta source
         lda current_dl_ptr+1
         sta source+1
-        
-        lda #<dlist_image
-        sta target
-        lda #>dlist_image
-        sta target+1
-        
-        ldx #IMAGE_HEIGHT
 
-insert_all
+        ldx #0
         ldy #0
-        lda #$4e            ; gfx 15 + DMA
-        sta (target),y
-        lda (source),y
-        iny
-        sta (target),y
-        lda (source),y
-        iny
-        sta (target),y
- 
-        lda #2
-        jsr add_source
-        lda #3
-        jsr add_target
 
-        dex
-        bne insert_all
+insert_p1
+        lda #$4e
+        sta dlist_image,x
+        lda (source),y
+        sta dlist_image+1,x
+        iny
+        lda (source),y
+        sta dlist_image+2,x
+        iny 
+        
+        inx
+        inx
+        inx
+        
+        cpy #80*2         ; first part
+        bne insert_p1 
+
+        lda #2*80
+        jsr add_source
+        
+        ldx #0
+        ldy #0
+
+insert_p2
+        lda #$4e
+        sta dlist_image+(3*80),x
+        lda (source),y
+        sta dlist_image+(3*80)+1,x
+        iny
+        lda (source),y
+        sta dlist_image+(3*80)+2,x
+        iny 
+        
+        inx
+        inx
+        inx
+                
+        cpy #22*2         ; second part
+        bne insert_p2
 
         rts
         
 main
         jsr make_scanline_ptrs
 
+        jsr reset_current_dl_ptr
         jsr insert_image_dl
 
-        lda #6 
+        lda #6
         ldx #>vbi
         ldy #<vbi
         jsr SETVBV
@@ -208,6 +208,25 @@ vbi
 
         jsr insert_image_dl
         
+        lda current_dl_ptr
+        clc
+        adc #2
+        sta current_dl_ptr
+        lda current_dl_ptr+1
+        adc #0
+        sta current_dl_ptr+1
+
+        lda current_dl_ptr
+        cmp last_dl_ptr
+        bne not_last_image
+        lda current_dl_ptr+1
+        cmp last_dl_ptr+1
+        bne not_last_image
+        
+        jsr reset_current_dl_ptr
+
+not_last_image
+
         lda #0
         sta $d01a
 
@@ -252,5 +271,37 @@ tSAG
         dta d'       Stichting Atari Gebruikers       '
 tPOKEY
         dta d'            Stichting Pokey             '
+
+; first entry must repeat in last entry to generate extra scanlines for vertical scrolling
+image_tab_lo
+        dta <lABBUC
+        dta <lPOKEY
+        dta <lSAG
+        dta <lABBUC
+
+image_tab_hi
+;        dta >lABBUC
+        dta >lABBUC
+        dta >lPOKEY
+        dta >lSAG
+        dta >lABBUC
+
+; image data
+
+        .align $1000
+lABBUC
+        ins 'abbuc.raw'
+
+        .align $1000
+lSAG
+        ins 'sag.raw'
+
+        .align $1000
+lPOKEY
+        ins 'pokey.raw'
+
+        .align $1000
+
+scanline_tab = *
 
         run main
