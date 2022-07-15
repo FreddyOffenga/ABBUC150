@@ -149,7 +149,11 @@ insert_p2
                 
         cpy #22*2         ; second part
         bne insert_p2
-
+        
+; try fixed dli
+        lda #$ce
+        sta dlist_image
+        
         rts
         
 main
@@ -233,13 +237,25 @@ not_last_image
         jmp XITVBV
 
 dli0    pha
+        lda #$46
+        sta COLPF0
+        lda #$48
+        sta COLPF1
+        lda #$4a
+        sta COLPF2
+        
+        mwa #dli1 VDSLST
+
+        pla
+        rti
+
+dli1    pha
         lda #0
         sta COLPF2
         lda #10
         sta COLPF1
         pla
         rti
-
         .align $4000
 
 dlist
