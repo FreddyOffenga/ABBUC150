@@ -158,16 +158,11 @@ main
 
         jsr insert_image_dl
 
-        lda #0
-        sta COLBK
-        sta COLOR1
-        sta COLOR2
-        sta COLOR3
-        sta COLOR4
-
-        mwa #dli0 VDSLST
-        mwa #dlist SDLSTL
-
+        lda #6 
+        ldx #>vbi
+        ldy #<vbi
+        jsr SETVBV
+        
         lda #$c0        ; Enable DLI
         sta NMIEN
 
@@ -179,7 +174,7 @@ wait
         lda #$40
         sta NMIEN
 
-        lda #6                  ; Restore Immediate VBlank 
+        lda #6
         ldx #$e4
         ldy #$5f
         jsr SETVBV
@@ -203,6 +198,20 @@ wait
 
         rts
 // END: main
+
+vbi
+        lda #34
+        sta $d01a
+
+        mwa #dlist DLISTL
+        mwa #dli0 VDSLST
+
+        jsr insert_image_dl
+        
+        lda #0
+        sta $d01a
+
+        jmp XITVBV
 
 dli0    pha
         lda #0
