@@ -13,6 +13,7 @@ source          = $f0
 target          = $f2
 line_count      = $f4
 image_number    = $f5
+current_dl_ptr  = $f6
 
 scanline_tab    = $8000
 
@@ -49,6 +50,26 @@ IMAGE_COUNT = 2         ; image tab size
 IMAGE_WIDTH = 40        ; bytes
 IMAGE_HEIGHT = 102      ; scanlines
 
+; add a to target
+add_target
+        clc
+        adc target
+        sta target
+        lda target+1
+        adc #0
+        sta target+1
+        rts
+
+; add a to source
+add_source
+        clc
+        adc source
+        sta source
+        lda source+1
+        adc #0
+        sta source+1
+        rts
+
 make_scanline_ptrs
         lda #<scanline_tab
         sta target
@@ -77,22 +98,12 @@ copy_line_ptrs
         iny
         sta (target),y
 
-        lda target
-        clc
-        adc #2
-        sta target
-        lda target+1
-        adc #0
-        sta target+1
-
-        lda source
-        clc
-        adc #IMAGE_WIDTH
-        sta source
-        lda source+1
-        adc #0
-        sta source+1
-
+        lda #2
+        jsr add_target
+        
+        lda #IMAGE_WIDTH
+        jsr add_source
+        
         dec line_count
         bne copy_line_ptrs
 
@@ -103,8 +114,49 @@ copy_line_ptrs
 
         rts
 
+insert_image_dl
+        lda #<scanline_tab
+        sta current_dl_ptr
+        lda #>scanline_tab
+        sta current_dl_ptr+1
+        
+        lda current_dl_ptr
+        sta source
+        lda current_dl_ptr+1
+        sta source+1
+        
+        lda #<dlist_image
+        sta target
+        lda #>dlist_image
+        sta target+1
+        
+        ldx #IMAGE_HEIGHT
+
+insert_all
+        ldy #0
+        lda #$4e            ; gfx 15 + DMA
+        sta (target),y
+        lda (source),y
+        iny
+        sta (target),y
+        lda (source),y
+        iny
+        sta (target),y
+ 
+        lda #2
+        jsr add_source
+        lda #3
+        jsr add_target
+
+        dex
+        bne insert_all
+
+        rts
+        
 main
         jsr make_scanline_ptrs
+
+        jsr insert_image_dl
 
         lda #0
         sta COLBK
@@ -123,11 +175,6 @@ wait
         lda CONSOL
         cmp #6                  ; Wait for START
         bne wait
-
-; Next part
-        mwa #lSAG logo
-        mwa #tSAG title
-        jmp wait
 
         lda #$40
         sta NMIEN
@@ -169,12 +216,17 @@ dli0    pha
 
 dlist
 :3      dta DL_BLANK8                   ; 70
-        dta DL_GR15 | DL_LMS | DL_DLI   ; ce
+;        dta DL_GR15 | DL_LMS | DL_DLI   ; ce
 
-logo
-        dta a(lPOKEY)
+;logo
+;        dta a(lPOKEY)
 
-:101    dta DL_GR15
+;:101    dta DL_GR15
+
+dlist_image
+; space for image DL (102 x 3)
+:102*3  dta 0
+
         dta DL_BLANK7 | DL_DLI
         dta DL_GR0 | DL_LMS
 
