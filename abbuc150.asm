@@ -1,3 +1,5 @@
+; ABBUC 150 intro
+
 /*
 ** COMPILE:
 ** # Windows
@@ -24,6 +26,53 @@ IMAGE_COUNT = 4
 IMAGE_WIDTH = 40        ; bytes
 IMAGE_HEIGHT = 102      ; scanlines
 
+main
+        jsr make_scanline_ptrs
+        
+        jsr make_color_tables
+        
+        jsr reset_current_dl_ptr
+        
+        jsr insert_image_dl
+
+        lda #6
+        ldx #>vbi
+        ldy #<vbi
+        jsr SETVBV
+        
+        lda #$c0        ; Enable DLI
+        sta NMIEN
+
+wait
+        lda CONSOL
+        cmp #6                  ; Wait for START
+        bne wait
+
+        lda #$40
+        sta NMIEN
+
+        lda #6
+        ldx #$e4
+        ldy #$5f
+        jsr SETVBV
+
+        lda #0
+        sta COLOR0
+        sta COLOR1
+        sta COLOR2
+        sta COLBK
+        sta AUDC1
+        sta AUDC2
+        sta AUDC3
+        sta AUDC4
+        sta IRQST
+        sta DMACTL
+        sta NMIEN
+        lda #$ff
+        sta PORTB
+
+        jmp *
+        
 ; add a to target
 add_target
         clc
@@ -155,53 +204,36 @@ insert_p2
         sta dlist_image
         
         rts
+
+; make all color tables
+
+; @todo :)
+make_color_tables
+        ldx #0
         
-main
-        jsr make_scanline_ptrs
+        lda #<color0_tab
+        sta target
+        lda #>color0_tab
+        sta target+1
 
-        jsr reset_current_dl_ptr
-        jsr insert_image_dl
-
-        lda #6
-        ldx #>vbi
-        ldy #<vbi
-        jsr SETVBV
+more_to_fill
+        lda image_colors0,x
         
-        lda #$c0        ; Enable DLI
-        sta NMIEN
+        ldy #0
+fill_colors        
+        sta (target),y
+        iny
+        cpy #IMAGE_HEIGHT
+        bne fill_colors
 
-wait
-        lda CONSOL
-        cmp #6                  ; Wait for START
-        bne wait
-
-        lda #$40
-        sta NMIEN
-
-        lda #6
-        ldx #$e4
-        ldy #$5f
-        jsr SETVBV
-
-        lda #0
-        sta COLOR0
-        sta COLOR1
-        sta COLOR2
-        sta COLBK
-        sta AUDC1
-        sta AUDC2
-        sta AUDC3
-        sta AUDC4
-        sta IRQST
-        sta DMACTL
-        sta NMIEN
-        lda #$ff
-        sta PORTB
-
-        jmp *
-
+        lda #IMAGE_HEIGHT
+        jsr add_target
+        
+        inx
+        cpx #IMAGE_COUNT
+        bne more_to_fill
+                
         rts
-// END: main
 
 vbi
         lda #34
@@ -236,16 +268,41 @@ not_last_image
 
         jmp XITVBV
 
+; @todo 
+; should change the color0_tab address here in the VBI
+; color0_tab should point to the color of the current (first) scanline in the DL image
+; each color should use their own colorX_tab
+
 dli0    pha
-        lda #$46
-        sta COLPF0
-        lda #$48
-        sta COLPF1
-        lda #$4a
-        sta COLPF2
+        txa
+        pha
+        tya
+        pha
+        
+        ldx #0
+rasters
+        lda color0_tab,x
+        tay
+        lda color0_tab,x
+        sta WSYNC
+        sta COLBK           ; COLPF2
+        sty COLBK           ; COLPF0
+
+        lda color0_tab,x
+        sta COLBK           ; COLPF1
+        lda color0_tab,x
+        sta COLBK
+
+        inx
+        cpx #IMAGE_HEIGHT
+        bne rasters
         
         mwa #dli1 VDSLST
 
+        pla
+        tay
+        pla
+        tax
         pla
         rti
 
@@ -256,6 +313,7 @@ dli1    pha
         sta COLPF1
         pla
         rti
+
         .align $4000
 
 dlist
@@ -288,6 +346,51 @@ tSAG
 tPOKEY
         dta d'            Stichting Pokey             '
 
+; colors for each image
+color0_ABBUC    = $02
+color1_ABBUC    = $26
+color2_ABBUC    = $48
+color3_ABBUC    = $7a
+
+color0_POKEY    = $04
+color1_POKEY    = $26
+color2_POKEY    = $48
+color3_POKEY    = $7a
+
+color0_SAG      = $06
+color1_SAG      = $26
+color2_SAG      = $48
+color3_SAG      = $7a
+
+                .align $100
+                
+image_colors0
+        dta color0_ABBUC
+        dta color0_POKEY
+        dta color0_SAG
+        dta color0_ABBUC
+        
+image_colors1
+        dta color1_ABBUC
+        dta color1_POKEY
+        dta color1_SAG
+        dta color1_ABBUC
+
+image_colors2
+        dta color2_ABBUC
+        dta color2_POKEY
+        dta color2_SAG
+        dta color2_ABBUC
+
+image_colors3
+        dta color3_ABBUC
+        dta color3_POKEY
+        dta color3_SAG
+        dta color3_ABBUC
+   
+colors_ABBUC
+        dta $00,$26,$48,$7a
+
 ; first entry must repeat in last entry to generate extra scanlines for vertical scrolling
 image_tab_lo
         dta <lABBUC
@@ -319,5 +422,26 @@ lPOKEY
         .align $1000
 
 scanline_tab = *
+
+        org scanline_tab+(IMAGE_HEIGHT*IMAGE_COUNT*2)
+
+; scanline color tables for all images
+color0_tab
+
+        org color0_tab+(IMAGE_HEIGHT*IMAGE_COUNT)
+        
+color1_tab
+
+        org color1_tab+(IMAGE_HEIGHT*IMAGE_COUNT)
+
+color2_tab
+
+        org color2_tab+(IMAGE_HEIGHT*IMAGE_COUNT)
+
+color3_tab
+
+        org color3_tab+(IMAGE_HEIGHT*IMAGE_COUNT)
+
+; more...
 
         run main
