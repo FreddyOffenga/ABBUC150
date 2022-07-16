@@ -207,17 +207,37 @@ insert_p2
 
 ; make all color tables
 
-; @todo :)
 make_color_tables
         ldx #0
+all_colors
+        txa
+        pha
         
-        lda #<color0_tab
+        lda image_colors_lo,x
+        sta source
+        lda image_colors_hi,x
+        sta source+1
+        
+        lda color_tab_lo,x
         sta target
-        lda #>color0_tab
+        lda color_tab_hi,x
         sta target+1
+        
+        jsr fill_one_table
 
+        pla
+        tax
+        inx
+        cpx #4
+        bne all_colors
+        rts        
+
+fill_one_table
+        ldy #0
 more_to_fill
-        lda image_colors0,x
+        tya
+        pha
+        lda (source),y
         
         ldy #0
 fill_colors        
@@ -229,8 +249,10 @@ fill_colors
         lda #IMAGE_HEIGHT
         jsr add_target
         
-        inx
-        cpx #IMAGE_COUNT
+        pla
+        tay
+        iny
+        cpy #IMAGE_COUNT
         bne more_to_fill
                 
         rts
@@ -281,17 +303,17 @@ dli0    pha
         
         ldx #0
 rasters
-        lda color0_tab,x
+        lda color1_tab,x
         tay
         lda color0_tab,x
         sta WSYNC
-        sta COLBK           ; COLPF2
-        sty COLBK           ; COLPF0
-
-        lda color0_tab,x
-        sta COLBK           ; COLPF1
-        lda color0_tab,x
         sta COLBK
+        sty COLPF0
+
+        lda color2_tab,x
+        sta COLPF1
+        lda color3_tab,x
+        sta COLPF2
 
         inx
         cpx #IMAGE_HEIGHT
@@ -347,23 +369,35 @@ tPOKEY
         dta d'            Stichting Pokey             '
 
 ; colors for each image
-color0_ABBUC    = $02
-color1_ABBUC    = $26
+color0_ABBUC    = $00
+color1_ABBUC    = $46
 color2_ABBUC    = $48
-color3_ABBUC    = $7a
+color3_ABBUC    = $4a
 
 color0_POKEY    = $04
 color1_POKEY    = $26
-color2_POKEY    = $48
-color3_POKEY    = $7a
+color2_POKEY    = $2a
+color3_POKEY    = $2c
 
 color0_SAG      = $06
-color1_SAG      = $26
-color2_SAG      = $48
-color3_SAG      = $7a
+color1_SAG      = $2a
+color2_SAG      = $4c
+color3_SAG      = $7e
 
                 .align $100
-                
+
+image_colors_lo
+        dta <image_colors0
+        dta <image_colors1
+        dta <image_colors2
+        dta <image_colors3
+
+image_colors_hi
+        dta >image_colors0
+        dta >image_colors1
+        dta >image_colors2
+        dta >image_colors3
+
 image_colors0
         dta color0_ABBUC
         dta color0_POKEY
@@ -442,6 +476,16 @@ color3_tab
 
         org color3_tab+(IMAGE_HEIGHT*IMAGE_COUNT)
 
-; more...
+color_tab_lo
+        dta <color0_tab
+        dta <color1_tab
+        dta <color2_tab
+        dta <color3_tab
+
+color_tab_hi
+        dta >color0_tab
+        dta >color1_tab
+        dta >color2_tab
+        dta >color3_tab
 
         run main
