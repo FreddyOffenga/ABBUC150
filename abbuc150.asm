@@ -99,7 +99,29 @@ reset_current_dl_ptr
         lda #>scanline_tab
         sta current_dl_ptr+1
         rts
+
+reset_colors
+        lda #<color0_tab
+        sta color0_ptr
+        lda #>color0_tab
+        sta color0_ptr+1
         
+        lda #<color1_tab
+        sta color1_ptr
+        lda #>color1_tab
+        sta color1_ptr+1
+        
+        lda #<color2_tab
+        sta color2_ptr
+        lda #>color2_tab
+        sta color2_ptr+1
+
+        lda #<color3_tab
+        sta color3_ptr
+        lda #>color3_tab
+        sta color3_ptr+1
+        rts
+
 make_scanline_ptrs
         lda #<scanline_tab
         sta target
@@ -198,11 +220,7 @@ insert_p2
                 
         cpy #22*2         ; second part
         bne insert_p2
-        
-; try fixed dli
-        lda #$ce
-        sta dlist_image
-        
+
         rts
 
 ; make all color tables
@@ -264,6 +282,26 @@ vbi
         mwa #dlist DLISTL
         mwa #dli0 VDSLST
 
+        inc color0_ptr
+        bne nh_c0
+        inc color0_ptr+1
+nh_c0
+
+        inc color1_ptr
+        bne nh_c1
+        inc color1_ptr+1
+nh_c1
+
+        inc color2_ptr
+        bne nh_c2
+        inc color2_ptr+1
+nh_c2
+
+        inc color3_ptr
+        bne nh_c3
+        inc color3_ptr+1
+nh_c3
+
         jsr insert_image_dl
         
         lda current_dl_ptr
@@ -282,6 +320,7 @@ vbi
         bne not_last_image
         
         jsr reset_current_dl_ptr
+        jsr reset_colors
 
 not_last_image
 
@@ -303,21 +342,29 @@ dli0    pha
         
         ldx #0
 rasters
+color1_ptr  = *+1
         lda color1_tab,x
         tay
+color0_ptr  = *+1         
         lda color0_tab,x
         sta WSYNC
         sta COLBK
         sty COLPF0
 
+color2_ptr  = *+1
         lda color2_tab,x
         sta COLPF1
+color3_ptr  = *+1
         lda color3_tab,x
         sta COLPF2
 
         inx
         cpx #IMAGE_HEIGHT
         bne rasters
+
+; end of raster colors
+        lda #0
+        sta COLBK
         
         mwa #dli1 VDSLST
 
@@ -339,13 +386,9 @@ dli1    pha
         .align $4000
 
 dlist
-:3      dta DL_BLANK8                   ; 70
-;        dta DL_GR15 | DL_LMS | DL_DLI   ; ce
+:2      dta DL_BLANK8                   ; 70
 
-;logo
-;        dta a(lPOKEY)
-
-;:101    dta DL_GR15
+        dta DL_BLANK8 | DL_DLI
 
 dlist_image
 ; space for image DL (102 x 3)
@@ -374,14 +417,14 @@ color1_ABBUC    = $46
 color2_ABBUC    = $48
 color3_ABBUC    = $4a
 
-color0_POKEY    = $04
-color1_POKEY    = $26
-color2_POKEY    = $2a
-color3_POKEY    = $2c
+color0_POKEY    = $1c
+color1_POKEY    = $28
+color2_POKEY    = $04
+color3_POKEY    = $20
 
-color0_SAG      = $06
-color1_SAG      = $2a
-color2_SAG      = $4c
+color0_SAG      = $0c
+color1_SAG      = $24
+color2_SAG      = $00
 color3_SAG      = $7e
 
                 .align $100
