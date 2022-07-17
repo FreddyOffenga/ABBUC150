@@ -279,6 +279,9 @@ vbi
         lda #34
         sta $d01a
 
+        lda #0
+        sta CHACTL
+
         mwa #dlist DLISTL
         mwa #dli0 VDSLST
 
@@ -376,12 +379,40 @@ color3_ptr  = *+1
         rti
 
 dli1    pha
-        lda #0
-        sta COLPF2
-        lda #10
+        txa
+        pha
+        
+        ldx #0
+rasta
+        lda scrol_raster,x
+        sta WSYNC
         sta COLPF1
+        inx
+        cpx #16
+        bne rasta
+
+        lda #4
+        sta CHACTL
+        
+        ldx #15
+rasta2
+        lda scrol_raster,x
+        sta WSYNC
+        sta COLPF1
+        dex
+        dex
+        bpl rasta2
+                
+        pla
+        tax
         pla
         rti
+
+scrol_raster
+        dta $00,$22,$24,$26
+        dta $28,$2a,$0c,$0e
+        dta $0e,$0c,$8a,$88
+        dta $86,$84,$82,$00
 
         .align $4000
 
@@ -395,21 +426,21 @@ dlist_image
 :102*3  dta 0
 
         dta DL_BLANK7 | DL_DLI
-        dta DL_GR0 | DL_LMS
+        
+        dta DL_GR2 | DL_LMS
+scrol_ptr1
+        dta a(scroltext)
 
-title
-        dta a(tABBUC)
+        dta DL_GR1 | DL_LMS
+scrol_ptr2
+        dta a(scroltext)
                 
         dta DL_JVB
 
         dta a(dlist)
 
-tABBUC
-        dta d'       Atari Bit Byters User Club       '
-tSAG
-        dta d'       Stichting Atari Gebruikers       '
-tPOKEY
-        dta d'            Stichting Pokey             '
+scroltext
+        dta d'plaats voor scroller'
 
 ; colors for each image
 color0_ABBUC    = $00
