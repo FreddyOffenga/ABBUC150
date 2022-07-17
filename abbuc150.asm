@@ -22,7 +22,7 @@ last_dl_ptr     = $f8
 
         org $2000
 
-IMAGE_COUNT = 4
+IMAGE_COUNT = 5
 IMAGE_WIDTH = 40        ; bytes
 IMAGE_HEIGHT = 102      ; scanlines
 
@@ -427,6 +427,11 @@ color1_SAG      = $24
 color2_SAG      = $00
 color3_SAG      = $7e
 
+color0_AGGF     = $00
+color1_AGGF     = $0c
+color2_AGGF     = $74
+color3_AGGF     = $26
+
                 .align $100
 
 image_colors_lo
@@ -445,34 +450,36 @@ image_colors0
         dta color0_ABBUC
         dta color0_POKEY
         dta color0_SAG
+        dta color0_AGGF
         dta color0_ABBUC
         
 image_colors1
         dta color1_ABBUC
         dta color1_POKEY
         dta color1_SAG
+        dta color1_AGGF
         dta color1_ABBUC
 
 image_colors2
         dta color2_ABBUC
         dta color2_POKEY
         dta color2_SAG
+        dta color2_AGGF
         dta color2_ABBUC
 
 image_colors3
         dta color3_ABBUC
         dta color3_POKEY
         dta color3_SAG
+        dta color3_AGGF
         dta color3_ABBUC
-   
-colors_ABBUC
-        dta $00,$26,$48,$7a
 
 ; first entry must repeat in last entry to generate extra scanlines for vertical scrolling
 image_tab_lo
         dta <lABBUC
         dta <lPOKEY
         dta <lSAG
+        dta <lAGGF
         dta <lABBUC
 
 image_tab_hi
@@ -480,6 +487,7 @@ image_tab_hi
         dta >lABBUC
         dta >lPOKEY
         dta >lSAG
+        dta >lAGGF
         dta >lABBUC
 
 ; image data
@@ -497,6 +505,8 @@ lPOKEY
         ins 'pokey.raw'
 
         .align $1000
+lAGGF
+        ins 'friesland.raw'
 
 scanline_tab = *
 
