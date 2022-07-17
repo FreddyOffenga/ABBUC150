@@ -281,6 +281,19 @@ vbi
 
         lda #0
         sta CHACTL
+        
+        lda 20
+        and #7
+        bne no_course
+        
+        inc scrol_ptr1
+        inc scrol_ptr2
+        
+        lda #0
+no_course
+        eor #7
+        sta HSCROL
+        inc 20
 
         mwa #dlist DLISTL
         mwa #dli0 VDSLST
@@ -381,7 +394,7 @@ color3_ptr  = *+1
 dli1    pha
         txa
         pha
-        
+ 
         ldx #0
 rasta
         lda scrol_raster,x
@@ -427,20 +440,17 @@ dlist_image
 
         dta DL_BLANK7 | DL_DLI
         
-        dta DL_GR2 | DL_LMS
+        dta DL_GR2 | DL_LMS | $10       ; enable HSCROL
 scrol_ptr1
         dta a(scroltext)
 
-        dta DL_GR1 | DL_LMS
+        dta DL_GR1 | DL_LMS | $10       ; enable HSCROL
 scrol_ptr2
         dta a(scroltext)
                 
         dta DL_JVB
 
         dta a(dlist)
-
-scroltext
-        dta d'plaats voor scroller'
 
 ; colors for each image
 color0_ABBUC    = $00
@@ -462,6 +472,11 @@ color0_AGGF     = $00
 color1_AGGF     = $0c
 color2_AGGF     = $74
 color3_AGGF     = $26
+
+                .align $100
+
+scroltext
+                icl 'inc/scroltext.inc'
 
                 .align $100
 
