@@ -468,10 +468,10 @@ color1_SAG      = $24
 color2_SAG      = $00
 color3_SAG      = $7e
 
-color0_AGGF     = $00
-color1_AGGF     = $0c
+color0_AGGF     = $0c
+color1_AGGF     = $26
 color2_AGGF     = $74
-color3_AGGF     = $26
+color3_AGGF     = $00
 
                 .align $100
 
@@ -540,19 +540,19 @@ image_tab_hi
 
         .align $1000
 lABBUC
-        ins 'abbuc.raw'
+        ins 'images/abbuc.raw'
 
         .align $1000
 lSAG
-        ins 'sag.raw'
+        ins 'images/sag.raw'
 
         .align $1000
 lPOKEY
-        ins 'pokey.raw'
+        ins 'images/pokey.raw'
 
         .align $1000
 lAGGF
-        ins 'friesland.raw'
+        ins 'images/friesland.raw'
 
 scanline_tab = *
 
