@@ -287,7 +287,28 @@ vbi
         bne no_course
         
         inc scrol_ptr1
-        inc scrol_ptr2
+        bne no_hi_scrol
+        inc scrol_ptr1+1
+no_hi_scrol
+
+        lda scrol_ptr1
+        cmp #<scroltext_end
+        bne no_end_scrol
+        lda scrol_ptr1+1
+        cmp #>scroltext_end
+        bne no_end_scrol
+        
+        lda #<scroltext
+        sta scrol_ptr1
+        lda #>scroltext
+        sta scrol_ptr1+1
+
+no_end_scrol
+        lda scrol_ptr1
+        sta scrol_ptr2
+        lda scrol_ptr1+1
+        sta scrol_ptr2+1
+
         
         lda #0
 no_course
@@ -476,7 +497,10 @@ color3_AGGF     = $00
                 .align $100
 
 scroltext
+                dta d'                    '
                 icl 'inc/scroltext.inc'
+scroltext_end
+                dta d'                    '
 
                 .align $100
 

@@ -1,4 +1,3 @@
-        dta d'                    '
         dta d'gefeliciteerd and congratulations to all ABBUC members! '
         dta d'the atari users of the netherlands are celebrating the 50th '
         dta d'anniversary of atari and the 150th issue of ABBUC magazine. '
@@ -11,4 +10,3 @@
         dta d'more years to come. we want to say hello to the following people and groups: '
         dta d'later in te vullen. '
         dta d'we hope to see a lot of people at the next JHV in herten, support the little atari! '
-        dta d'                    '
