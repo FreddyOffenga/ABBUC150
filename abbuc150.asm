@@ -403,7 +403,10 @@ color3_ptr  = *+1
 ; end of raster colors
         lda #0
         sta COLBK
-        
+        sta COLPF0
+        sta COLPF1
+        sta COLPF2
+
         mwa #dli1 VDSLST
 
         pla
