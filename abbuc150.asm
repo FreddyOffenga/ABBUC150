@@ -377,6 +377,7 @@ dli0    pha
         tya
         pha
         
+        sta WSYNC
         ldx #0
 rasters
 color1_ptr  = *+1
