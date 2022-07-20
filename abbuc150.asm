@@ -22,7 +22,7 @@ last_dl_ptr     = $f8
 
         org $2000
 
-IMAGE_COUNT = 5
+IMAGE_COUNT = 6
 IMAGE_WIDTH = 40        ; bytes
 IMAGE_HEIGHT = 102      ; scanlines
 
@@ -309,7 +309,6 @@ no_end_scrol
         lda scrol_ptr1+1
         sta scrol_ptr2+1
 
-        
         lda #0
 no_course
         eor #7
@@ -452,7 +451,7 @@ scrol_raster
         dta $0e,$0c,$8a,$88
         dta $86,$84,$82,$00
 
-        .align $4000
+        .align $400
 
 dlist
 :2      dta DL_BLANK8                   ; 70
@@ -498,6 +497,11 @@ color1_AGGF     = $26
 color2_AGGF     = $74
 color3_AGGF     = $00
 
+color0_congrats = $0e
+color1_congrats = $84
+color2_congrats = $24
+color3_congrats = $00
+
                 .align $100
 
 scroltext
@@ -522,6 +526,7 @@ image_colors_hi
 
 image_colors0
         dta color0_ABBUC
+        dta color0_congrats
         dta color0_POKEY
         dta color0_SAG
         dta color0_AGGF
@@ -529,6 +534,7 @@ image_colors0
         
 image_colors1
         dta color1_ABBUC
+        dta color1_congrats
         dta color1_POKEY
         dta color1_SAG
         dta color1_AGGF
@@ -536,6 +542,7 @@ image_colors1
 
 image_colors2
         dta color2_ABBUC
+        dta color2_congrats
         dta color2_POKEY
         dta color2_SAG
         dta color2_AGGF
@@ -543,6 +550,7 @@ image_colors2
 
 image_colors3
         dta color3_ABBUC
+        dta color3_congrats
         dta color3_POKEY
         dta color3_SAG
         dta color3_AGGF
@@ -551,6 +559,7 @@ image_colors3
 ; first entry must repeat in last entry to generate extra scanlines for vertical scrolling
 image_tab_lo
         dta <lABBUC
+        dta <lcongrats
         dta <lPOKEY
         dta <lSAG
         dta <lAGGF
@@ -559,6 +568,7 @@ image_tab_lo
 image_tab_hi
 ;        dta >lABBUC
         dta >lABBUC
+        dta >lcongrats
         dta >lPOKEY
         dta >lSAG
         dta >lAGGF
@@ -581,6 +591,10 @@ lPOKEY
         .align $1000
 lAGGF
         ins 'images/friesland.raw'
+
+        .align $1000
+lcongrats
+        ins 'images/gefeliciteerd.raw'
 
 scanline_tab = *
 
