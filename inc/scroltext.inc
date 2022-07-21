@@ -16,6 +16,6 @@
         dta d'many years and we hope that there are many more years to come. '
         dta d'oh no, we have to stop again       thomas wants to sing a song '
         dta d'for us      please thomas sing somewhere else     what?      '
-        dta d'we do not have any time left.         oh well, erm well? That '
+        dta d'we do not have any time left.         oh well, erm     well? That '
         dta d'is andreas favorite english word     our time is up '         
         dta d'we hope to see everyone at the next JHV in herten, support the little atari! '
