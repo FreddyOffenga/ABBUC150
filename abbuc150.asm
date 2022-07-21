@@ -423,7 +423,7 @@ dli1    pha
 rasta
         lda scrol_raster,x
         sta WSYNC
-        sta COLPF1
+        sta COLPF0
         inx
         cpx #16
         bne rasta
