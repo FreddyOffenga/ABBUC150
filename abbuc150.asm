@@ -487,15 +487,15 @@ color1_POKEY    = $28
 color2_POKEY    = $04
 color3_POKEY    = $20
 
-color0_SAG      = $0c
+color0_SAG      = $0e
 color1_SAG      = $24
 color2_SAG      = $00
-color3_SAG      = $7e
+color3_SAG      = $7c
 
-color0_AGGF     = $0c
-color1_AGGF     = $26
-color2_AGGF     = $74
-color3_AGGF     = $00
+color0_AGGF     = $dc
+color1_AGGF     = $0e
+color2_AGGF     = $26
+color3_AGGF     = $74
 
 color0_congrats = $0e
 color1_congrats = $84
@@ -525,54 +525,53 @@ image_colors_hi
         dta >image_colors3
 
 image_colors0
-        dta color0_ABBUC
         dta color0_congrats
+        dta color0_ABBUC
         dta color0_POKEY
         dta color0_SAG
         dta color0_AGGF
-        dta color0_ABBUC
+        dta color0_congrats
         
 image_colors1
-        dta color1_ABBUC
         dta color1_congrats
+        dta color1_ABBUC
         dta color1_POKEY
         dta color1_SAG
         dta color1_AGGF
-        dta color1_ABBUC
+        dta color1_congrats
 
 image_colors2
-        dta color2_ABBUC
         dta color2_congrats
+        dta color2_ABBUC
         dta color2_POKEY
         dta color2_SAG
         dta color2_AGGF
-        dta color2_ABBUC
+        dta color2_congrats
 
 image_colors3
-        dta color3_ABBUC
         dta color3_congrats
+        dta color3_ABBUC
         dta color3_POKEY
         dta color3_SAG
         dta color3_AGGF
-        dta color3_ABBUC
+        dta color3_congrats
 
 ; first entry must repeat in last entry to generate extra scanlines for vertical scrolling
 image_tab_lo
-        dta <lABBUC
         dta <lcongrats
+        dta <lABBUC
         dta <lPOKEY
         dta <lSAG
         dta <lAGGF
-        dta <lABBUC
+        dta <lcongrats
 
 image_tab_hi
-;        dta >lABBUC
-        dta >lABBUC
         dta >lcongrats
+        dta >lABBUC
         dta >lPOKEY
         dta >lSAG
         dta >lAGGF
-        dta >lABBUC
+        dta >lcongrats
 
 ; image data
 
