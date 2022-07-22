@@ -276,8 +276,14 @@ fill_colors
         rts
 
 vbi
-        lda #34
-        sta $d01a
+; end of raster colors
+        lda #0
+        sta COLBK
+        sta COLPF0
+        sta COLPF1
+        sta COLPF2
+;        lda #34
+;        sta $d01a
 
         lda #0
         sta CHACTL
@@ -424,6 +430,11 @@ rasta
         lda scrol_raster,x
         sta WSYNC
         sta COLPF0
+        lda VCOUNT
+        adc 20
+        lsr
+;        lda highlight_raster,x
+        sta COLPF1
         inx
         cpx #16
         bne rasta
@@ -435,13 +446,34 @@ rasta
 rasta2
         lda scrol_raster,x
         sta WSYNC
+        and #$0f
+        sta COLPF0
         sta COLPF1
         dex
         dex
         bpl rasta2
-                
+
+        mwa #dli2 VDSLST
+
         pla
         tax
+        pla
+        rti
+
+skyline_color0 = 6
+skyline_color1 = 8
+skyline_color2 = 10
+
+dli2
+        pha
+
+        lda #skyline_color0
+        sta COLPF0
+        lda #skyline_color1
+        sta COLPF1
+        lda #skyline_color2
+        sta COLPF2
+                
         pla
         rti
 
@@ -450,6 +482,12 @@ scrol_raster
         dta $28,$2a,$0c,$0e
         dta $0e,$0c,$8a,$88
         dta $86,$84,$82,$00
+
+highlight_raster
+        dta $00,$02,$04,$06
+        dta $08,$0a,$2c,$2e
+        dta $2e,$2c,$da,$d8
+        dta $d6,$d4,$d2,$00
 
         .align $400
 
@@ -462,7 +500,7 @@ dlist_image
 ; space for image DL (102 x 3)
 :102*3  dta 0
 
-        dta DL_BLANK7 | DL_DLI
+        dta DL_BLANK8 | DL_DLI
         
         dta DL_GR2 | DL_LMS | $10       ; enable HSCROL
 scrol_ptr1
@@ -471,9 +509,14 @@ scrol_ptr1
         dta DL_GR1 | DL_LMS | $10       ; enable HSCROL
 scrol_ptr2
         dta a(scroltext)
-                
-        dta DL_JVB
 
+        dta DL_BLANK8 | DL_DLI
+
+        dta DL_GR7 | DL_LMS
+        dta a(skyline)
+:31     dta DL_GR7
+
+        dta DL_JVB
         dta a(dlist)
 
 ; colors for each image
@@ -594,6 +637,10 @@ lAGGF
         .align $1000
 lcongrats
         ins 'images/gefeliciteerd.raw'
+
+        .align $1000
+skyline
+        ins 'images/skylinegr7.raw'
 
 scanline_tab = *
 
