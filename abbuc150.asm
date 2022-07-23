@@ -285,6 +285,9 @@ vbi
 ;        lda #34
 ;        sta $d01a
 
+        lda #>megafont
+        STA CHBASE
+
         lda #0
         sta CHACTL
         
@@ -641,6 +644,10 @@ lcongrats
         .align $1000
 skyline
         ins 'images/skylinegr7.raw'
+
+        .align $0400
+megafont
+        ins 'fonts/megazine.fnt'
 
 scanline_tab = *
 
