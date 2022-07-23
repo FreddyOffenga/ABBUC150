@@ -463,6 +463,7 @@ color3_ptr  = *+1
 
 ; end of raster colors
         lda #0
+        sta WSYNC
         sta COLBK
         sta COLPF0
         sta COLPF1
