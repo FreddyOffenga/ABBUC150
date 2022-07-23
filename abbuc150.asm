@@ -263,13 +263,31 @@ all_colors
 
         ldx #0
 try_abbuc_colors
-        txa
+        lda raster_abbuc,x
         sta color1_tab_ABBUC,x
         inx
         cpx #IMAGE_HEIGHT
         bne try_abbuc_colors
         
         rts        
+
+raster_abbuc
+        dta $12,$14,$16,$18,$1a,$1c,$0e,$0e
+        dta $20,$22,$24,$26,$28,$2a,$2c,$2e,$0e,$0e
+        dta $50,$52,$54,$56,$58,$5a,$5c,$5e,$0e,$0e
+        dta $70,$72,$74,$76,$78,$7a,$7c,$7e,$0e,$0e
+        dta $80,$82,$84,$86,$88,$8a,$8c,$8e,$0e,$0e
+        dta $b0,$b2,$b4,$b6,$b8,$ba,$bc,$be,$0e,$0e
+        dta $d0,$d2,$d4,$d6,$d8,$da,$dc,$de,$0e,$0e
+        dta $f0,$f2,$f4,$f6,$f8,$fa,$fc,$fe,$0e,$0e
+        
+        dta $04,$04,$04,$04,$04,$04,$04,$04
+        dta $08,$08,$08,$08,$08,$08,$08,$08
+        dta $04,$04,$04,$04,$04,$04,$04,$04
+        dta $08,$08,$08,$08,$08,$08,$08,$08
+
+        dta $04,$04,$04,$04,$04,$04
+        
 
 fill_one_table
         ldy #0
