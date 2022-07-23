@@ -568,9 +568,9 @@ scrol_ptr2
 
         dta DL_BLANK8 | DL_DLI
 
-        dta DL_GR7 | DL_LMS
+        dta DL_GR15 | DL_LMS
         dta a(skyline)
-:31     dta DL_GR7
+:63     dta DL_GR15
 
         dta DL_JVB
         dta a(dlist)
@@ -696,7 +696,7 @@ lcongrats
 
         .align $1000
 skyline
-        ins 'images/skylinegr7.raw'
+        ins 'images/skylinegr15.raw'
 
         .align $0400
 megafont
