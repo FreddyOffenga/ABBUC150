@@ -258,6 +258,17 @@ all_colors
         inx
         cpx #4
         bne all_colors
+        
+; raster colors for ABBUC
+
+        ldx #0
+try_abbuc_colors
+        txa
+        sta color1_tab_ABBUC,x
+        inx
+        cpx #IMAGE_HEIGHT
+        bne try_abbuc_colors
+        
         rts        
 
 fill_one_table
@@ -565,10 +576,15 @@ scrol_ptr2
         dta a(dlist)
 
 ; colors for each image
+color0_congrats = $0e
+color1_congrats = $84
+color2_congrats = $24
+color3_congrats = $00
+
 color0_ABBUC    = $00
-color1_ABBUC    = $46
+color1_ABBUC    = $26
 color2_ABBUC    = $48
-color3_ABBUC    = $4a
+color3_ABBUC    = $6a
 
 color0_POKEY    = $1c
 color1_POKEY    = $28
@@ -584,11 +600,6 @@ color0_AGGF     = $dc
 color1_AGGF     = $0e
 color2_AGGF     = $26
 color3_AGGF     = $74
-
-color0_congrats = $0e
-color1_congrats = $84
-color2_congrats = $24
-color3_congrats = $00
 
                 .align $100
 
@@ -701,7 +712,7 @@ color0_tab
         org color0_tab+(IMAGE_HEIGHT*IMAGE_COUNT)
         
 color1_tab
-
+color1_tab_ABBUC = color1_tab + IMAGE_HEIGHT
         org color1_tab+(IMAGE_HEIGHT*IMAGE_COUNT)
 
 color2_tab
