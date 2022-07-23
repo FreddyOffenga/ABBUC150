@@ -11,12 +11,15 @@
 
         icl "inc/systemequates.20070530_bkw.inc"            ; Don't forget the specify -i:<path to file> at compile time
 
-source          = $f0
-target          = $f2
-line_count      = $f4
-image_number    = $f5
-current_dl_ptr  = $f6
-last_dl_ptr     = $f8
+source              = $f0
+target              = $f2
+line_count          = $f4
+image_number        = $f5
+current_dl_ptr      = $f6
+last_dl_ptr         = $f8
+is_image_moving     = $fa
+image_scrol_count   = $fb
+image_clock         = $fc   ; and $fd
 
 ; ABBUC 150
 
@@ -34,6 +37,13 @@ main
         jsr reset_current_dl_ptr
         
         jsr insert_image_dl
+
+; init
+        lda #0
+        sta 20
+        sta is_image_moving
+        sta image_scrol_count
+        sta image_clock
 
         lda #6
         ldx #>vbi
@@ -294,7 +304,7 @@ vbi
         lda 20
         and #7
         bne no_course
-        
+                
         inc scrol_ptr1
         bne no_hi_scrol
         inc scrol_ptr1+1
@@ -322,11 +332,31 @@ no_end_scrol
 no_course
         eor #7
         sta HSCROL
+
         inc 20
+        
+        inc image_clock
+        bne no_hi_clock
+        inc image_clock+1
+no_hi_clock
 
         mwa #dlist DLISTL
         mwa #dli0 VDSLST
 
+        jsr insert_image_dl
+
+        lda is_image_moving
+        bne move_image
+       
+; pause
+        lda image_clock+1
+        and #1
+        beq skip_moving
+        
+        lda #1
+        sta is_image_moving     
+
+move_image        
         inc color0_ptr
         bne nh_c0
         inc color0_ptr+1
@@ -346,8 +376,6 @@ nh_c2
         bne nh_c3
         inc color3_ptr+1
 nh_c3
-
-        jsr insert_image_dl
         
         lda current_dl_ptr
         clc
@@ -368,7 +396,21 @@ nh_c3
         jsr reset_colors
 
 not_last_image
+        inc image_scrol_count
+        lda image_scrol_count
+        cmp #IMAGE_HEIGHT
+        bne keep_moving
+        
+        lda #0
+        sta is_image_moving
+        lda #0
+        sta image_clock
+        sta image_clock+1
+        sta image_scrol_count
 
+keep_moving
+
+skip_moving
         lda #0
         sta $d01a
 
@@ -405,7 +447,7 @@ color3_ptr  = *+1
         sta COLPF2
 
         inx
-        cpx #IMAGE_HEIGHT
+        cpx #IMAGE_HEIGHT-1
         bne rasters
 
 ; end of raster colors
