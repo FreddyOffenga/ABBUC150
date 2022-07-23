@@ -517,23 +517,37 @@ rasta2
         pla
         rti
 
-skyline_color0 = 6
-skyline_color1 = 8
-skyline_color2 = 10
-
 dli2
         pha
-
-        lda #skyline_color0
-        sta COLPF0
-        lda #skyline_color1
-        sta COLPF1
-        lda #skyline_color2
-        sta COLPF2
-                
+        txa
+        pha
+        
+        ldx #0
+        stx COLPF0
+do_sky
+        lda skyline_raster,x
+        sta WSYNC
+        sta COLBK
+        inx
+        cpx #64
+        bne do_sky
+        
+        pla
+        tax        
         pla
         rti
 
+skyline_raster
+        dta $70,$70,$70,$70,$70,$70,$70,$70
+        dta $62,$60,$62,$60,$62,$60,$62,$60
+        dta $54,$50,$54,$50,$54,$50,$54,$50
+        dta $46,$40,$46,$40,$46,$40,$46,$40
+
+        dta $38,$30,$38,$30,$38,$30,$38,$30
+        dta $2a,$20,$2a,$20,$2a,$20,$2a,$20
+        dta $1c,$10,$1c,$10,$1c,$10,$1c,$10
+        dta $de,$d2,$de,$d2,$de,$d2,$de,$00
+        
 scrol_raster
         dta $00,$22,$24,$26
         dta $28,$2a,$0c,$0e
@@ -549,15 +563,14 @@ highlight_raster
         .align $400
 
 dlist
-:2      dta DL_BLANK8                   ; 70
-
-        dta DL_BLANK8 | DL_DLI
+        dta DL_BLANK8                   ; 70
+        dta DL_BLANK8 | DL_DLI          ; dli0
 
 dlist_image
 ; space for image DL (102 x 3)
 :102*3  dta 0
 
-        dta DL_BLANK8 | DL_DLI
+        dta DL_BLANK8 | DL_DLI          ; dli1
         
         dta DL_GR2 | DL_LMS | $10       ; enable HSCROL
 scrol_ptr1
@@ -567,7 +580,7 @@ scrol_ptr1
 scrol_ptr2
         dta a(scroltext)
 
-        dta DL_BLANK8 | DL_DLI
+        dta DL_BLANK8 | DL_DLI          ; dli2
 
         dta DL_GR15 | DL_LMS
         dta a(skyline)
