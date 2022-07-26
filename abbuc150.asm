@@ -280,13 +280,10 @@ raster_abbuc
         dta $b0,$b2,$b4,$b6,$b8,$ba,$bc,$be,$0e,$0e
         dta $d0,$d2,$d4,$d6,$d8,$da,$dc,$de,$0e,$0e
         dta $f0,$f2,$f4,$f6,$f8,$fa,$fc,$fe,$0e,$0e
-        
-        dta $04,$04,$04,$04,$04,$04,$04,$04
-        dta $08,$08,$08,$08,$08,$08,$08,$08
-        dta $04,$04,$04,$04,$04,$04,$04,$04
-        dta $08,$08,$08,$08,$08,$08,$08,$08
 
-        dta $04,$04,$04,$04,$04,$04
+        dta $00,$00,$00
+        dta $04,$06,$04,$06,$08,$06,$08,$06,$0a,$08
+        dta $0a,$08,$0c,$0a,$0c,$0a,$0e,$0c,$0e,$0c
         
 
 fill_one_table
@@ -508,7 +505,6 @@ rasta
         lda VCOUNT
         adc 20
         lsr
-;        lda highlight_raster,x
         sta COLPF1
         inx
         cpx #16
@@ -571,12 +567,6 @@ scrol_raster
         dta $28,$2a,$0c,$0e
         dta $0e,$0c,$8a,$88
         dta $86,$84,$82,$00
-
-highlight_raster
-        dta $00,$02,$04,$06
-        dta $08,$0a,$2c,$2e
-        dta $2e,$2c,$da,$d8
-        dta $d6,$d4,$d2,$00
 
         .align $400
 
