@@ -30,6 +30,8 @@ IMAGE_WIDTH = 40        ; bytes
 IMAGE_HEIGHT = 102      ; scanlines
 
 main
+        jsr music_init
+
         jsr make_scanline_ptrs
         
         jsr make_color_tables
@@ -440,6 +442,8 @@ skip_moving
         lda #0
         sta $d01a
 
+        jsr music_play
+        
         jmp XITVBV
 
 ; @todo 
@@ -756,5 +760,13 @@ color_tab_hi
         dta >color1_tab
         dta >color2_tab
         dta >color3_tab
+
+music_start = $a800
+music_init  = $a80f
+music_play  = $a85e
+
+        org music_start
+        
+        ins 'music/Earth_Wind_and_Fired.xex',+6
 
         run main
