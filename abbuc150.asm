@@ -1,13 +1,8 @@
 ; ABBUC 150 intro
 
-/*
-** COMPILE:
-** # Windows
-** "c:\Program Files (x86)\MADS\mads.exe" -i:inc\ -o:xex\filename.xex filename.asm
-**
-** # Linux / OSX
-** mads -i:inc/ -o:xex/filename.xex filename.asm
-*/
+; Text/Idea: Fred_M
+; Code: F#READY
+; Music: IvoP
 
         icl "inc/systemequates.20070530_bkw.inc"            ; Don't forget the specify -i:<path to file> at compile time
 
@@ -54,34 +49,6 @@ main
         
         lda #$c0        ; Enable DLI
         sta NMIEN
-
-wait
-        lda CONSOL
-        cmp #6                  ; Wait for START
-        bne wait
-
-        lda #$40
-        sta NMIEN
-
-        lda #6
-        ldx #$e4
-        ldy #$5f
-        jsr SETVBV
-
-        lda #0
-        sta COLOR0
-        sta COLOR1
-        sta COLOR2
-        sta COLBK
-        sta AUDC1
-        sta AUDC2
-        sta AUDC3
-        sta AUDC4
-        sta IRQST
-        sta DMACTL
-        sta NMIEN
-        lda #$ff
-        sta PORTB
 
         jmp *
         
